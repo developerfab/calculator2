@@ -2,18 +2,31 @@ from django.http import HttpResponse
 from django.shortcuts import render
 from django.template import RequestContext, loader
 from warnings import catch_warnings
+from mipagina.forms import FormInput
 
-diccionary={'bienvenido':'Hola bienvenido a nuestro sitio web',"image":"reflector1.png","accion":"/mipagina/contacto/"}
+#It is a dictionary with is envoy the templates
+dictionary={'bienvenido':'Hola bienvenido a nuestro sitio web',"image":"reflector1.png","accion":"/mipagina/contacto/"}
 
 #fomulario
+"""
+@param request: This parameter is the input envoy by the template
+@return: This function return one web site and one dictionary by dates
+  
+"""
 def contacto (request):  
     dato1= request.POST['ent1'] # aqui le pedimos al request al dato 'ent1' del formulario
-    diccionary['respuesta']=dato1
+    dictionary['respuesta']=dato1
    # print ("hola")#se imprime en consola para saber si la funcion se esta ejeutando 
     #return render(request,'contacto.html',dic)#renderizamos enviando el diccionario
-    return render(request,'index.html',diccionary)
+    return render(request,'index.html',dictionary)
 
 #funcion de llamado
+
+"""
+@param request: This parameter is the input envoy by the template
+@return: This function return one number with the operation indicate
+
+"""
 
 def fun (request):
     hola='hola mundo, el resultado es:'
@@ -22,17 +35,25 @@ def fun (request):
     retorno='<html><body>%s menos</body></html>'% concatena
     return HttpResponse(retorno)
 
-#calculadora 
+#calculated
 
+"""
+@param request: This parameter is the input envoy by the template, this contains three dates, two 
+numbers for do the operation indicate in the third parameter
+@return: This function return the response of operation between the two parameters admitted in the form
+
+"""
 def calcula(request):
     
-    #SE ASIGNAN LAS VARIABLES ENVIADAS
-    
-    num1 = int(request.POST['ent1'])
-    num2 = int(request.POST['ent2'])
-    opc = int(request.POST['opc'])
-    
-    #SE HACER LA SELECCION DE LA OPCION
+    #Assing the variables of entry
+    try:
+        num1 = int(request.POST['Numero_1'])
+        num2 = int(request.POST['Numero_2'])
+        opc = int(request.POST['operacion'])
+    except:
+        dictionary['respuesta']='No se aceptan valores diferentes a numeros'
+        return render(request,'index.html',dictionary)
+    #Is the selection of the option
     
     if opc==1:
         total=num1+num2
@@ -47,17 +68,50 @@ def calcula(request):
             print ('Error, division por cero')
             total="Error, division por cero"
             
-    #SE ASIGNA LA INFORMACION AL DICCIONARIO 
+    #Assing the information the dictionary
          
-    diccionary['respuesta']=str(total)
+    dictionary['respuesta']=str(total)
     
-    #SE RETORNA LA INFORMACION
+    #Return information
     
-    return render(request,'index.html',diccionary)
+    return render(request,'index.html',dictionary)
 
-#Se llama al template index.html
+#Called the template index.html
+
+"""
+@param request: This parameter is the input envoy by template 
+@return: This function return one web site and one dictionary of dates
+
+"""
+
 def solution (request):
-    return render(request, 'index.html',diccionary)
+    return render(request, 'index.html',dictionary)
 
 def sol2 (request):
-    return render(request, 'contacto.html',diccionary)
+    return render(request, 'contacto.html',dictionary)
+
+"""
+@param request: This parameter es thi input envoy by template
+In this function return the form to the template, and validates the dates admitted
+by the user
+
+"""
+
+def formulario(request):
+    
+    #Cheked the method of the request
+    
+    if request.method == 'POST':
+        
+        #Assing the form
+        form = FormInput(request.POST)
+        
+        #Called the function calcula
+        calcula(request)
+        
+        if form.is_valid():
+            return render(request,'index.html',dictionary)
+    else:
+        form=FormInput()
+    dictionary['form']=form
+    return render(request,'index.html',dictionary)
