@@ -46,13 +46,10 @@ numbers for do the operation indicate in the third parameter
 def calcula(request):
     
     #Assing the variables of entry
-    try:
-        num1 = int(request.POST['Numero_1'])
-        num2 = int(request.POST['Numero_2'])
-        opc = int(request.POST['operacion'])
-    except:
-        dictionary['respuesta']='No se aceptan valores diferentes a numeros'
-        return render(request,'index.html',dictionary)
+    num1 = int(request.POST['Numero_1'])
+    num2 = int(request.POST['Numero_2'])
+    opc = int(request.POST['operacion'])
+    
     #Is the selection of the option
     
     if opc==1:
@@ -67,14 +64,10 @@ def calcula(request):
         except:
             print ('Error, division por cero')
             total="Error, division por cero"
-            
-    #Assing the information the dictionary
-         
-    dictionary['respuesta']=str(total)
-    
+                
     #Return information
     
-    return render(request,'index.html',dictionary)
+    return total
 
 #Called the template index.html
 
@@ -107,11 +100,12 @@ def formulario(request):
         form = FormInput(request.POST)
         
         #Called the function calcula
-        calcula(request)
         
         if form.is_valid():
+            rta=calcula(request)
+            dictionary['respuesta']=rta
             return render(request,'index.html',dictionary)
     else:
-        form=FormInput()
+        form=FormInput()       
     dictionary['form']=form
     return render(request,'index.html',dictionary)
